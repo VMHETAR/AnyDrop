@@ -15,5 +15,7 @@ int main(){
 
     // Create a UDP socket
     listenfd = socket(AF_INET,SOCK_DGRAM,0);
-    
+    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    servaddr.sin_port = htons(PORT);
+    servaddr.sin_family = AF_INET;
 }
