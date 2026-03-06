@@ -1,23 +1,48 @@
 #include <stdio.h>
-#include <strings.h>
-#include <sys/types.h>
+#include <string.h>
+#include <stdlib.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
+
 #define PORT 5000
 #define MAXLINE 1000
 
-int main(){
-    WSADATA wsdata;
-    char buffer[100];
-    int listenfd, len;
-    struct sockaddr_in servaddr, cliaddr;
-    bzero(&servaddr, sizeof(servaddr));
+int main(int argc, char *argv[]) {
 
-    // Create a UDP socket
-    listenfd = socket(AF_INET,SOCK_DGRAM,0);
-    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    servaddr.sin_port = htons(PORT);
-    servaddr.sin_family = AF_INET;
+    if(argc != 4){
+        printf("Usage: %s <peer_ip> <peer_port> <message>\n", argv[0]);
+        return EXIT_FAILURE;
+    }
 
-    //Bind 
+    WSADATA wsa;
+    WSAStartup(MAKEWORD(2,2), &wsa);
+
+    const char *peer_ip = argv[1];
+    int peer_port = atoi(argv[2]);
+    const char *message = argv[3];
+
+    struct sockaddr_in peer_addr;
+    peer_addr.sin_family = AF_INET;
+    peer_addr.sin_port = htons(peer_port);
+
+    if (inet_pton(AF_INET, peer_ip, &(peer_addr.sin_addr)) <= 0){
+        perror("Invalid IP address");
+        return EXIT_FAILURE;
+    }
+
+    int udp_socket = socket(AF_INET, SOCK_DGRAM, 0);
+    if (udp_socket < 0){
+        perror("Socket creation failed");
+        return EXIT_FAILURE;
+    }
+
+    if(sendto(udp_socket, message, strlen(message)+1, 0,
+        (struct sockaddr*)&peer_addr, sizeof(peer_addr)) < 0){
+        perror("Failed to send message");
+        closesocket(udp_socket);
+        return EXIT_FAILURE;
+    }
+
+    closesocket(udp_socket);
+    WSACleanup();
 }
