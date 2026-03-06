@@ -11,6 +11,9 @@ int main(){
     char buffer[100];
     int listenfd, len;
     struct sockaddr_in servaddr, cliaddr;
+    bzero(&servaddr, sizeof(servaddr));
 
+    // Create a UDP socket
+    listenfd = socket(AF_INET,SOCK_DGRAM,0);
     
 }
