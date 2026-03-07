@@ -13,6 +13,8 @@ int main(int argc, char **argv){
     }
     int port = atoi(argv[1]);
     int udp_rsocket;
-    struct sockaddr_in;
+    struct sockaddr_in peer_addr;
+    struct sockaddr_in my_addr = {.sin_family=AF_INET, .sin_addr=INADDR_ANY, .sin_port=htons(port)};
     
+
 }
